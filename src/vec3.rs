@@ -10,7 +10,7 @@ pub struct Vec3 {
 
 #[allow(dead_code)]
 impl Vec3 {
-    fn minus(self) -> Self {
+    pub fn minus(self) -> Self {
         Self {
             x: -self.x,
             y: -self.y,
@@ -18,7 +18,7 @@ impl Vec3 {
         }
     }
 
-    fn scalarmult(self, t: f64) -> Self {
+    pub fn scalarmult(self, t: f64) -> Self {
         Self {
             x: self.x * t,
             y: self.y * t,
@@ -26,13 +26,13 @@ impl Vec3 {
         }
     }
 
-    fn scalarmultassign(&mut self, t: f64) {
+    pub fn scalarmultassign(&mut self, t: f64) {
         self.x *= t;
         self.y *= t;
         self.z *= t;
     }
 
-    fn scalardiv(self, t: f64) -> Self {
+    pub fn scalardiv(self, t: f64) -> Self {
         Self {
             x: self.x / t,
             y: self.y / t,
@@ -40,25 +40,25 @@ impl Vec3 {
         }
     }
 
-    fn scalardivtassign(&mut self, t: f64) {
+    pub fn scalardivtassign(&mut self, t: f64) {
         self.x /= t;
         self.y /= t;
         self.z /= t;
     }
 
-    fn length_squared(self) -> f64 {
+    pub fn length_squared(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    fn length(self) -> f64 {
+    pub fn length(self) -> f64 {
         f64::sqrt(self.length_squared())
     }
 
-    fn dot(self, rhs: Self) -> f64 {
+    pub fn dot(self, rhs: Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    fn cross(self, rhs: Self) -> Self {
+    pub fn cross(self, rhs: Self) -> Self {
         Self {
             x: self.y * rhs.z - self.z * rhs.y,
             y: self.z * rhs.x - self.x * rhs.z,
@@ -66,7 +66,7 @@ impl Vec3 {
         }
     }
 
-    fn unit_vector(self) -> Self {
+    pub fn unit_vector(self) -> Self {
         self.scalardiv(self.length())
     }
 }
