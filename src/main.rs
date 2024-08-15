@@ -7,9 +7,64 @@ use std::io::Write;
 use std::path::Path;
 
 use crate::color::{write_color, Color};
-use crate::vec3::Vec3;
+use crate::ray::{ray, Ray};
+use crate::vec3::{Point3, Vec3};
+
+fn ray_color(r: Ray) -> Color {
+    Color {
+        x: 0.,
+        y: 0.,
+        z: 0.,
+    }
+}
 
 fn main() {
+    // Image
+
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width: i64 = 400;
+
+    // Calculate the image height and ensure it's at least one
+    let mut image_height = ((image_width as f64) / aspect_ratio) as i64;
+    image_height = if image_height < 1 { 1 } else { image_height };
+
+    // camera
+    let focal_length = 1.;
+    let viewport_height = 2.0;
+    let viewport_width = viewport_height * ((image_width as f64) / (image_height as f64));
+    let camera_center = Point3 {
+        x: 0.,
+        y: 0.,
+        z: 0.,
+    };
+
+    // Calculate the vectores across the horizontal and down the vertical viewport edges
+    let viewport_u = Vec3 {
+        x: viewport_width,
+        y: 0.,
+        z: 0.,
+    };
+    let viewport_v = Vec3 {
+        x: 0.,
+        y: -viewport_height,
+        z: 0.,
+    };
+
+    // Calculate the horizontal and verdical delta vectors from pixel to pixel
+    let pixel_delta_u = viewport_u.scalardiv(image_width as f64);
+    let pixel_delta_v = viewport_v.scalardiv(image_height as f64);
+
+    // Calculate the location of the upper left pixel
+    let viewport_upper_left = camera_center
+        - Vec3 {
+            x: 0.,
+            y: 0.,
+            z: focal_length,
+        }
+        - viewport_u.scalardiv(2.)
+        - viewport_v.scalardiv(2.);
+    let pixel00_loc = viewport_upper_left + (pixel_delta_u + pixel_delta_v).scalarmult(0.5);
+
     let file_path = Path::new("image.ppm");
     let mut file = match File::create(file_path) {
         Err(hein) => panic!("Couldn't create file, {} is the cause.", hein),
@@ -18,12 +73,13 @@ fn main() {
     let _ = file.write("P3\n256 256\n255\n".as_bytes());
     for j in 0..256 {
         for i in 0..256 {
-            let pixel_color = Color {
-                x: (i as f64) / 255.0,
-                y: (j as f64) / 255.0,
-                z: 0.0,
-            };
-            write_color(&mut file, pixel_color)
+            let pixel_center = pixel00_loc
+                + pixel_delta_u.scalarmult(i as f64)
+                + pixel_delta_v.scalarmult(i as f64);
+            let ray_direction = pixel_center - camera_center;
+            let r = ray(camera_center, ray_direction);
+            let pixel_color = ray_color(r);
+            write_color(&mut file, pixel_color);
         }
     }
 }

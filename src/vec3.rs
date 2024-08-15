@@ -8,6 +8,8 @@ pub struct Vec3 {
     pub z: f64,
 }
 
+pub type Point3 = Vec3;
+
 #[allow(dead_code)]
 impl Vec3 {
     pub fn minus(self) -> Self {
