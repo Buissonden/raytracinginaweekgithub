@@ -20,21 +20,21 @@ fn hit_sphere(center: Point3, radius: f64, r: Ray) -> bool {
 }
 
 fn ray_color(r: Ray) -> Color {
-    //    if hit_sphere(
-    //        Point3 {
-    //            x: 0.,
-    //            y: 0.,
-    //            z: 0.,
-    //        },
-    //        0.5,
-    //        r,
-    //    ) {
-    //        return Color {
-    //            x: 1.,
-    //            y: 0.,
-    //            z: 0.,
-    //        };
-    //    }
+    if hit_sphere(
+        Point3 {
+            x: 0.,
+            y: 0.,
+            z: -1.,
+        },
+        0.5,
+        r,
+    ) {
+        return Color {
+            x: 1.,
+            y: 0.,
+            z: 0.,
+        };
+    }
 
     let unit_direction = r.direction().unit_vector();
     let a = (unit_direction.y + 1.) * 0.5;
@@ -109,7 +109,7 @@ fn main() {
         for i in 0..image_width {
             let pixel_center = pixel00_loc
                 + pixel_delta_u.scalarmult(i as f64)
-                + pixel_delta_v.scalarmult(i as f64);
+                + pixel_delta_v.scalarmult(j as f64);
             let ray_direction = pixel_center - camera_center;
             let r = ray(camera_center, ray_direction);
             let pixel_color = ray_color(r);
