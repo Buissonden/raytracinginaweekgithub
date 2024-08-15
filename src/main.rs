@@ -11,11 +11,20 @@ use crate::ray::{ray, Ray};
 use crate::vec3::{Point3, Vec3};
 
 fn ray_color(r: Ray) -> Color {
+    let unit_direction = r.direction().unit_vector();
+    let a = (unit_direction.y + 1.) * 0.5;
     Color {
-        x: 0.,
-        y: 0.,
-        z: 0.,
+        x: 1.,
+        y: 1.,
+        z: 1.,
     }
+    .scalarmult(1. - a)
+        + Color {
+            x: 0.5,
+            y: 0.7,
+            z: 1.,
+        }
+        .scalarmult(a)
 }
 
 fn main() {
