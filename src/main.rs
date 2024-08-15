@@ -12,14 +12,14 @@ use crate::vec3::{Point3, Vec3};
 
 fn hit_sphere(center: Point3, radius: f64, r: Ray) -> f64 {
     let oc = center - r.origin();
-    let a = r.direction().dot(r.direction());
-    let b = -2.0 * r.direction().dot(oc);
-    let c = oc.dot(oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let a = r.direction().length_squared();
+    let h = r.direction().dot(oc);
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = h * h - a * c;
     if discriminant < 0. {
-        return -1.;
+        -1.
     } else {
-        return (-b - f64::sqrt(discriminant)) / (2. * a);
+        (h - f64::sqrt(discriminant)) / a
     }
 }
 
@@ -34,7 +34,7 @@ fn ray_color(r: Ray) -> Color {
         r,
     );
     if t > 0. {
-        let N = (r.at(t)
+        let normal = (r.at(t)
             - Vec3 {
                 x: 0.,
                 y: 0.,
@@ -42,9 +42,9 @@ fn ray_color(r: Ray) -> Color {
             })
         .unit_vector();
         return Color {
-            x: N.x + 1.,
-            y: N.y + 1.,
-            z: N.z + 1.,
+            x: normal.x + 1.,
+            y: normal.y + 1.,
+            z: normal.z + 1.,
         }
         .scalarmult(0.5);
     }
