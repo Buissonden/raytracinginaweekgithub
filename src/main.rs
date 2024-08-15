@@ -10,7 +10,32 @@ use crate::color::{write_color, Color};
 use crate::ray::{ray, Ray};
 use crate::vec3::{Point3, Vec3};
 
+fn hit_sphere(center: Point3, radius: f64, r: Ray) -> bool {
+    let oc = center - r.origin();
+    let a = r.direction().dot(r.direction());
+    let b = -2.0 * r.direction().dot(oc);
+    let c = oc.dot(oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    discriminant >= 0.
+}
+
 fn ray_color(r: Ray) -> Color {
+    //    if hit_sphere(
+    //        Point3 {
+    //            x: 0.,
+    //            y: 0.,
+    //            z: 0.,
+    //        },
+    //        0.5,
+    //        r,
+    //    ) {
+    //        return Color {
+    //            x: 1.,
+    //            y: 0.,
+    //            z: 0.,
+    //        };
+    //    }
+
     let unit_direction = r.direction().unit_vector();
     let a = (unit_direction.y + 1.) * 0.5;
     Color {
@@ -79,9 +104,9 @@ fn main() {
         Err(hein) => panic!("Couldn't create file, {} is the cause.", hein),
         Ok(file) => file,
     };
-    let _ = file.write("P3\n256 256\n255\n".as_bytes());
-    for j in 0..256 {
-        for i in 0..256 {
+    let _ = file.write(format!("P3\n{} {}\n255\n", image_width, image_height).as_bytes());
+    for j in 0..image_height {
+        for i in 0..image_width {
             let pixel_center = pixel00_loc
                 + pixel_delta_u.scalarmult(i as f64)
                 + pixel_delta_v.scalarmult(i as f64);
