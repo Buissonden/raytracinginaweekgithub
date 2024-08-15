@@ -10,17 +10,21 @@ use crate::color::{write_color, Color};
 use crate::ray::{ray, Ray};
 use crate::vec3::{Point3, Vec3};
 
-fn hit_sphere(center: Point3, radius: f64, r: Ray) -> bool {
+fn hit_sphere(center: Point3, radius: f64, r: Ray) -> f64 {
     let oc = center - r.origin();
     let a = r.direction().dot(r.direction());
     let b = -2.0 * r.direction().dot(oc);
     let c = oc.dot(oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    discriminant >= 0.
+    if discriminant < 0. {
+        return -1.;
+    } else {
+        return (-b - f64::sqrt(discriminant)) / (2. * a);
+    }
 }
 
 fn ray_color(r: Ray) -> Color {
-    if hit_sphere(
+    let t = hit_sphere(
         Point3 {
             x: 0.,
             y: 0.,
@@ -28,12 +32,21 @@ fn ray_color(r: Ray) -> Color {
         },
         0.5,
         r,
-    ) {
+    );
+    if t > 0. {
+        let N = (r.at(t)
+            - Vec3 {
+                x: 0.,
+                y: 0.,
+                z: -1.,
+            })
+        .unit_vector();
         return Color {
-            x: 1.,
-            y: 0.,
-            z: 0.,
-        };
+            x: N.x + 1.,
+            y: N.y + 1.,
+            z: N.z + 1.,
+        }
+        .scalarmult(0.5);
     }
 
     let unit_direction = r.direction().unit_vector();
